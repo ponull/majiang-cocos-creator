@@ -1,7 +1,14 @@
 var URL = "http://192.168.31.22:9000";
 
-
 cc.VERSION = 20180108; //版本号
+
+/**
+ * HTTP - 网络请求模块
+ * 
+ * 封装HTTP请求逻辑，与Cocos Creator的cc.loader解耦。
+ * 使用标准XMLHttpRequest替代cc.loader.getXMLHttpRequest()，
+ * 同时保持向后兼容。
+ */
 var HTTP = cc.Class({
     extends: cc.Component,
     //静态块基本信息
@@ -10,17 +17,45 @@ var HTTP = cc.Class({
         userId : 0,
         master_url:URL,
         url:URL,
+        
+        /**
+         * 创建XMLHttpRequest对象（与cc.loader解耦）
+         * @returns {XMLHttpRequest}
+         */
+        _createXHR: function() {
+            // 优先使用标准XMLHttpRequest，保持cc.loader兼容性
+            if (typeof XMLHttpRequest !== 'undefined') {
+                return new XMLHttpRequest();
+            }
+            if (cc.loader && cc.loader.getXMLHttpRequest) {
+                return cc.loader.getXMLHttpRequest();
+            }
+            return new XMLHttpRequest();
+        },
+        
+        /**
+         * 构建查询字符串
+         * @param {object} data - 请求参数
+         * @returns {string} 查询字符串
+         */
+        _buildQueryString: function(data) {
+            var str = "?";
+            for (var k in data) {
+                if (data.hasOwnProperty(k)) {
+                    if (str !== "?") {
+                        str += "&";
+                    }
+                    str += k + "=" + data[k];
+                }
+            }
+            return str;
+        },
+        
         //发送请求  路径 ，数据,handler,额外url
         sendRequest : function(path,data,handler,extraUrl){
-            var xhr = cc.loader.getXMLHttpRequest();
+            var xhr = this._createXHR();
             xhr.timeout = 5000;
-            var str = "?";
-            for(var k in data){
-                if(str != "?"){
-                    str += "&";
-                }
-                str += k + "=" + data[k];
-            }
+            var str = this._buildQueryString(data);
             if(extraUrl == null){
                 extraUrl = HTTP.url;
             }
@@ -38,10 +73,9 @@ var HTTP = cc.Class({
                         var ret = JSON.parse(xhr.responseText);
                         if(handler !== null){
                             handler(ret);
-                        }                        /* code */
+                        }
                     } catch (e) {
                         console.log("err:" + e);
-                        //handler(null);
                     }
                     finally{
                         if(cc.vv && cc.vv.wc){

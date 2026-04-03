@@ -1,5 +1,12 @@
-var mahjongSprites = [];
+var MahjongData = require('MahjongData');
 
+/**
+ * MahjongMgr - 麻将精灵管理组件
+ * 
+ * 负责管理麻将牌的精灵图集和UI展示。
+ * 纯数据逻辑已解耦到MahjongData模块中，此组件仅处理
+ * 与Cocos Creator渲染相关的功能。
+ */
 cc.Class({
     extends: cc.Component,
 
@@ -43,61 +50,21 @@ cc.Class({
             default:[],
             type:[cc.SpriteFrame]
         },
-        
-        _sides:null,
-        _pres:null,
-        _foldPres:null,
     },
     
     onLoad:function(){
         if(cc.vv == null){
             return;
         }
-        this._sides = ["myself","right","up","left"];
-        this._pres = ["M_","R_","B_","L_"];
-        this._foldPres = ["B_","R_","B_","L_"];
         cc.vv.mahjongmgr = this; 
-        //筒
-        for(var i = 1; i < 10; ++i){
-            mahjongSprites.push("dot_" + i);        
-        }
-        
-        //条
-        for(var i = 1; i < 10; ++i){
-            mahjongSprites.push("bamboo_" + i);
-        }
-        
-        //万
-        for(var i = 1; i < 10; ++i){
-            mahjongSprites.push("character_" + i);
-        }
-        
-        //中、发、白
-        mahjongSprites.push("red");
-        mahjongSprites.push("green");
-        mahjongSprites.push("white");
-        
-        //东西南北风
-        mahjongSprites.push("wind_east");
-        mahjongSprites.push("wind_west");
-        mahjongSprites.push("wind_south");
-        mahjongSprites.push("wind_north");
     },
     
     getMahjongSpriteByID:function(id){
-        return mahjongSprites[id];
+        return MahjongData.getTileNameByID(id);
     },
     
     getMahjongType:function(id){
-      if(id >= 0 && id < 9){
-          return 0;
-      }
-      else if(id >= 9 && id < 18){
-          return 1;
-      }
-      else if(id >= 18 && id < 27){
-          return 2;
-      }
+        return MahjongData.getTileType(id);
     },
     
     getSpriteFrameByMJID:function(pre,mjid){
@@ -118,17 +85,7 @@ cc.Class({
     },
     
     getAudioURLByMJID:function(id){
-        var realId = 0;
-        if(id >= 0 && id < 9){
-            realId = id + 21;
-        }
-        else if(id >= 9 && id < 18){
-            realId = id - 8;
-        }
-        else if(id >= 18 && id < 27){
-            realId = id - 7;
-        }
-        return "nv/" + realId + ".mp3";
+        return MahjongData.getAudioURLByTileID(id);
     },
     
     getEmptySpriteFrame:function(side){
@@ -162,33 +119,18 @@ cc.Class({
     },
     
     sortMJ:function(mahjongs,dingque){
-        var self = this;
-        mahjongs.sort(function(a,b){
-            if(dingque >= 0){
-                var t1 = self.getMahjongType(a);
-                var t2 = self.getMahjongType(b);
-                if(t1 != t2){
-                    if(dingque == t1){
-                        return 1;
-                    }
-                    else if(dingque == t2){
-                        return -1;
-                    }
-                }
-            }
-            return a - b;
-        });
+        MahjongData.sortTiles(mahjongs, dingque);
     },
     
     getSide:function(localIndex){
-        return this._sides[localIndex];
+        return MahjongData.getSide(localIndex);
     },
     
     getPre:function(localIndex){
-        return this._pres[localIndex];
+        return MahjongData.getPrefix(localIndex);
     },
     
     getFoldPre:function(localIndex){
-        return this._foldPres[localIndex];
+        return MahjongData.getFoldPrefix(localIndex);
     }
 });
