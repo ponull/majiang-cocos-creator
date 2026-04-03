@@ -7,9 +7,9 @@ exports.md5 = function (content) {
 }
 
 exports.toBase64 = function(content){
-	return new Buffer(content).toString('base64');
+	return Buffer.from(content).toString('base64');
 }
 
 exports.fromBase64 = function(content){
-	return new Buffer(content, 'base64').toString();
+	return Buffer.from(content, 'base64').toString();
 }
