@@ -23,14 +23,15 @@ var HTTP = cc.Class({
          * @returns {XMLHttpRequest}
          */
         _createXHR: function() {
-            // 优先使用标准XMLHttpRequest，保持cc.loader兼容性
+            // 优先使用标准XMLHttpRequest，回退到cc.loader兼容方式
             if (typeof XMLHttpRequest !== 'undefined') {
                 return new XMLHttpRequest();
             }
             if (cc.loader && cc.loader.getXMLHttpRequest) {
                 return cc.loader.getXMLHttpRequest();
             }
-            return new XMLHttpRequest();
+            console.error('HTTP: XMLHttpRequest is not available');
+            return null;
         },
         
         /**
