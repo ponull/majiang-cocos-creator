@@ -6,7 +6,13 @@ var roomMgr = require('./roommgr');
 var userMgr = require('./usermgr');
 var io = null;
 exports.start = function(config,mgr){
-	io = require('socket.io')(config.CLIENT_PORT);
+	var Server = require('socket.io').Server;
+	io = new Server(config.CLIENT_PORT, {
+		cors: {
+			origin: "*",
+			methods: ["GET", "POST"]
+		}
+	});
 	
 	io.sockets.on('connection',function(socket){
 		socket.on('login',function(data){

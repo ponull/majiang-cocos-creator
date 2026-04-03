@@ -3,20 +3,23 @@ if (!cc.loader.loadResAll) {
     cc.loader.loadResAll = cc.loader.loadResDir;
 }
 
+var EventBus = require('EventBus');
+var EventConstants = require('EventConstants');
 
+/**
+ * Lodinglogin - 启动加载场景控制器
+ * 
+ * 负责应用启动流程：
+ * 1. 初始化各管理器模块
+ * 2. 显示启动画面
+ * 3. 检查版本更新
+ * 4. 预加载资源
+ * 5. 跳转到登录场景
+ */
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        // foo: {
-        //    default: null,      // The default value will be used only when the component attaching
-        //                           to a node for the first time
-        //    url: cc.Texture2D,  // optional, default is typeof default
-        //    serializable: true, // optional, default is true
-        //    visible: true,      // optional, default is true
-        //    displayName: 'Foo', // optional
-        //    readonly: false,    // optional, default is false
-        // },
         _splash:null,    //启动页引导图
         tipLabel:cc.Label,  //加载标签
         _stateStr:'',        //标签文字
@@ -80,37 +83,54 @@ cc.Class({
             self.checkVersion();//检查版本更新
         }
     },
-    //初始化组件方法
+    
+    /**
+     * 初始化所有管理器模块
+     * 将管理器创建集中在此，便于管理依赖关系
+     */
     initMgr:function(){
         cc.vv = {};
-        var UserMgr = require("UserMgr");
-        cc.vv.userMgr = new UserMgr();   //用户信息
         
+        // 用户管理
+        var UserMgr = require("UserMgr");
+        cc.vv.userMgr = new UserMgr();
+        
+        // 回放管理
         var ReplayMgr = require("ReplayMgr");
-        cc.vv.replayMgr = new ReplayMgr();  //重播
-        //网络接口
+        cc.vv.replayMgr = new ReplayMgr();
+        
+        // 网络接口
         cc.vv.http = require("HTTP");
         cc.vv.global = require("Global");
         cc.vv.net = require("Net");
         
+        // 游戏网络管理
         var GameNetMgr = require("GameNetMgr");
         cc.vv.gameNetMgr = new GameNetMgr();
         cc.vv.gameNetMgr.initHandlers();
-        //anysdk
+        
+        // SDK管理
         var AnysdkMgr = require("AnysdkMgr");
         cc.vv.anysdkMgr = new AnysdkMgr();
         cc.vv.anysdkMgr.init();
-        //声音音频控制
+        
+        // 语音管理
         var VoiceMgr = require("VoiceMgr");
         cc.vv.voiceMgr = new VoiceMgr();
         cc.vv.voiceMgr.init();
         
+        // 音频管理
         var AudioMgr = require("AudioMgr");
         cc.vv.audioMgr = new AudioMgr();
         cc.vv.audioMgr.init();
-        //工具类
+        
+        // 工具类
         var Utils = require("Utils");
         cc.vv.utils = new Utils();
+        
+        // 事件总线（新增：提供跨模块通信）
+        cc.vv.eventBus = EventBus;
+        cc.vv.eventConstants = EventConstants;
         
         cc.args = this.urlParse();
     },
@@ -196,9 +216,13 @@ cc.Class({
         var self = this;
         
         cc.loader.onProgress = function ( completedCount, totalCount,  item ){
-            //console.log("completedCount:" + completedCount + ",totalCount:" + totalCount );
             if(self._isLoading){
                 self._progress = completedCount/totalCount;
+                EventBus.emit(EventConstants.UI.LOADING_PROGRESS, {
+                    progress: self._progress,
+                    completed: completedCount,
+                    total: totalCount
+                });
             }
         };
         
@@ -210,6 +234,7 @@ cc.Class({
     onLoadComplete:function(){
         this._isLoading = false;
         this._stateStr = "准备登陆";
+        EventBus.emit(EventConstants.UI.LOADING_COMPLETE);
         cc.director.loadScene("login");
         cc.loader.onComplete = null;
     },

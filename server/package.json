@@ -1,19 +1,23 @@
 {
   "name": "ybserver",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A server for ybgame",
   "main": "./account_server/app.js",
   "scripts": {
-    "account":"node config.js"
+    "account": "node account_server/app.js",
+    "hall": "node hall_server/app.js",
+    "game": "node majiang_server/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "author": "Songjiaqi",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.2",
-    "fibers": "^2.0.0",
-    "log4js": "^2.4.1",
-    "mysql": "^2.15.0",
-    "socket.io": "^2.0.4"
+    "express": "^4.21.2",
+    "log4js": "^6.9.1",
+    "mysql2": "^3.12.0",
+    "socket.io": "^4.8.1"
   }
 }

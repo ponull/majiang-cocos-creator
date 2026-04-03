@@ -1,8 +1,10 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es2017",
         "module": "commonjs",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "allowJs": true,
+        "checkJs": false
     },
     "exclude": [
         "node_modules",
@@ -10,6 +12,8 @@
         "library",
         "local",
         "settings",
-        "temp"
+        "temp",
+        "build",
+        "server/node_modules"
     ]
 }
