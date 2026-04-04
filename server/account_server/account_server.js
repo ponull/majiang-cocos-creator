@@ -81,9 +81,9 @@ app.get('/register',function(req,res){
         send(res,{errcode:0,errmsg:"ok"});//返回请求成功json
     };
 
-    //数据库查询是否存在用户
+    //数据库查询是否存在用户（账号不存在时才允许注册）
     db.is_account_exist(account,function(exist){
-        if(exist){
+        if(!exist){
             //账号创建入库
            db.create_account(account,password,function(ret){
             if(ret){
@@ -107,13 +107,13 @@ app.get('/auth',function(req,res){
    //数据库获取用户信息
    db.get_account_info(account,password,function(info){
     //如果信息等于空    
-    if(info=null){
+    if(info == null){
         send(res,{errcode:1,errmsg:"invalid account"});
         return;
     }
       
       var account="vivi_"+req.query.account;
-      var sign = get_md5(account + req.ip + config.ACCOUNT_PRI_KEY);
+      var sign = crypto.md5(account + req.ip + config.ACCOUNT_PRI_KEY);
       var ret = {
           errcode:0,
           errmsg:"ok",

@@ -7,7 +7,7 @@
     "account": "node account_server/app.js",
     "hall": "node hall_server/app.js",
     "game": "node majiang_server/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/orm_test.js"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -18,6 +18,8 @@
     "express": "^4.21.2",
     "log4js": "^6.9.1",
     "mysql2": "^3.12.0",
-    "socket.io": "^4.8.1"
+    "sequelize": "^6.37.8",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^6.0.1"
   }
 }
