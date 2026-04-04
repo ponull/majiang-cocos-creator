@@ -7,13 +7,24 @@ var ROOM_PRI_KEY = "~!@#$(*&^%$&";
 
 var LOCAL_IP = '192.168.31.22';
 
+// Database configuration.
+// Set dialect to 'mysql' | 'mariadb' | 'postgres' | 'mssql' | 'sqlite'.
+// For SQLite set STORAGE to a file path or ':memory:' (useful for tests).
 exports.mysql = function(){
 	return {
+		dialect: 'mysql',
 		HOST:'192.168.31.22',
 		USER:'root',
 		PSWD:'qq1314',
 		DB:'qqq',
 		PORT:3306,
+	}
+};
+
+exports.sqlite_memory = function(){
+	return {
+		dialect: 'sqlite',
+		STORAGE: ':memory:',
 	}
 };
 
