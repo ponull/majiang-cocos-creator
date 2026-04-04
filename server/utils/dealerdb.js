@@ -13,7 +13,7 @@ exports.init = function (config) {
 exports.create_dealer = async function (account, password, name, parent, privi) {
     if (account == null || password == null) return false;
 
-    const hashedPwd = crypto.md5(password);
+    const hashedPwd = crypto.hashPassword(password);
     try {
         await modelsModule.models.Dealer.create({
             account, password: hashedPwd, name, parent,
@@ -108,12 +108,11 @@ exports.get_dealer_by_account = async function (account) {
 
 exports.check_account = async function (account, password) {
     if (account == null || password == null) return null;
-    const hashedPwd = crypto.md5(password);
     try {
-        const row = await modelsModule.models.Dealer.findOne({
-            where: { account, password: hashedPwd },
-        });
-        return row ? row.toJSON() : null;
+        const row = await modelsModule.models.Dealer.findOne({ where: { account } });
+        if (!row) return null;
+        if (!crypto.verifyPassword(password, row.password)) return null;
+        return row.toJSON();
     } catch (err) {
         console.error(err);
         return null;
@@ -147,14 +146,13 @@ exports.update_token = async function (account, token) {
 
 exports.change_decaler_pwd = async function (account, oldPwd, newPwd) {
     if (account == null || oldPwd == null || newPwd == null) return false;
-    const hashedOld = crypto.md5(oldPwd);
-    const hashedNew = crypto.md5(newPwd);
     try {
-        const [affected] = await modelsModule.models.Dealer.update(
-            { password: hashedNew },
-            { where: { account, password: hashedOld } }
-        );
-        return affected > 0;
+        const row = await modelsModule.models.Dealer.findOne({ where: { account } });
+        if (!row) return false;
+        if (!crypto.verifyPassword(oldPwd, row.password)) return false;
+        row.password = crypto.hashPassword(newPwd);
+        await row.save();
+        return true;
     } catch (err) {
         console.error(err);
         return false;

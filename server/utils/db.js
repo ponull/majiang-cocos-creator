@@ -1,6 +1,7 @@
 'use strict';
 
 const { Op, QueryTypes } = require('sequelize');
+const { randomUUID } = require('crypto');
 const modelsModule = require('../models');
 const crypto = require('./crypto');
 
@@ -33,7 +34,7 @@ exports.create_account = function (account, password, callback) {
     callback = callback || nop;
     if (account == null || password == null) { callback(false); return; }
 
-    const psw = crypto.md5(password);
+    const psw = crypto.hashPassword(password);
     modelsModule.models.Account.create({ account, password: psw })
         .then(() => callback(true))
         .catch(err => {
@@ -51,8 +52,7 @@ exports.get_account_info = function (account, password, callback) {
         .then(row => {
             if (!row) { callback(null); return; }
             if (password != null) {
-                const psw = crypto.md5(password);
-                if (row.password !== psw) { callback(null); return; }
+                if (!crypto.verifyPassword(password, row.password)) { callback(null); return; }
             }
             callback(row.toJSON());
         })
@@ -91,7 +91,7 @@ exports.get_user_data_by_userid = function (userid, callback) {
 
     modelsModule.models.User.findOne({
         where: { userid },
-        attributes: ['userid', 'account', 'name', 'lv', 'exp', 'coins', 'gems', 'roomid'],
+        attributes: ['userid', 'account', 'name', 'lv', 'exp', 'coins', 'gems', 'roomid', 'sex'],
     }).then(row => {
         if (!row) { callback(null); return; }
         const data = row.toJSON();
@@ -225,7 +225,7 @@ exports.is_room_exist = function (roomId, callback) {
 
 exports.create_room = function (roomId, conf, ip, port, create_time, callback) {
     callback = callback || nop;
-    const uuid = String(Date.now()) + roomId;
+    const uuid = randomUUID();
     const baseInfo = JSON.stringify(conf);
     modelsModule.models.Room.create({ uuid, id: roomId, base_info: baseInfo, ip, port, create_time })
         .then(() => callback(uuid))
