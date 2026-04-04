@@ -112,12 +112,12 @@ app.get('/auth',function(req,res){
         return;
     }
       
-      var account="vivi_"+req.query.account;
-      var sign = crypto.md5(account + req.ip + config.ACCOUNT_PRI_KEY);
+      var viviAccount = "vivi_" + req.query.account;
+      var sign = crypto.md5(viviAccount + req.ip + config.ACCOUNT_PRI_KEY);
       var ret = {
           errcode:0,
           errmsg:"ok",
-          account:account,
+          account:viviAccount,
           sign:sign
       }
       send(res,ret);

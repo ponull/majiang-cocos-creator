@@ -225,7 +225,7 @@ exports.is_room_exist = function (roomId, callback) {
 
 exports.create_room = function (roomId, conf, ip, port, create_time, callback) {
     callback = callback || nop;
-    const uuid = randomBytes(10).toString('hex'); // 20 hex chars, fits in CHAR(20)
+    const uuid = randomBytes(10).toString('hex'); // 10 bytes → 20 hex chars, fits CHAR(20)
     const baseInfo = JSON.stringify(conf);
     modelsModule.models.Room.create({ uuid, id: roomId, base_info: baseInfo, ip, port, create_time })
         .then(() => callback(uuid))
