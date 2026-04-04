@@ -1,7 +1,7 @@
 'use strict';
 
 const { Op, QueryTypes } = require('sequelize');
-const { randomUUID } = require('crypto');
+const { randomBytes } = require('crypto');
 const modelsModule = require('../models');
 const crypto = require('./crypto');
 
@@ -225,7 +225,7 @@ exports.is_room_exist = function (roomId, callback) {
 
 exports.create_room = function (roomId, conf, ip, port, create_time, callback) {
     callback = callback || nop;
-    const uuid = randomUUID();
+    const uuid = randomBytes(10).toString('hex'); // 20 hex chars, fits in CHAR(20)
     const baseInfo = JSON.stringify(conf);
     modelsModule.models.Room.create({ uuid, id: roomId, base_info: baseInfo, ip, port, create_time })
         .then(() => callback(uuid))
@@ -356,7 +356,7 @@ exports.update_game_action_records = function (room_uuid, index, actions, callba
 
 exports.update_game_result = function (room_uuid, index, result, callback) {
     callback = callback || nop;
-    if (room_uuid == null) { callback(false); return; }
+    if (room_uuid == null || result == null) { callback(false); return; }
 
     const resultStr = JSON.stringify(result);
     modelsModule.models.Game.update(

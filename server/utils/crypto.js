@@ -19,20 +19,17 @@ exports.hashPassword = function (password) {
 };
 
 /**
- * Verify a password against a stored "salt:hash" string.
- * Falls back to plain MD5 comparison for legacy records (no ':' separator).
+ * Verify a password against a stored "salt:hash" string produced by hashPassword().
  */
 exports.verifyPassword = function (password, stored) {
 	if (!stored) return false;
-	if (stored.includes(':')) {
-		const [salt, hash] = stored.split(':');
-		const derived = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
-		return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(derived, 'hex'));
-	}
-	// Legacy: plain MD5 hash
-	const md5 = crypto.createHash('md5');
-	md5.update(password);
-	return stored === md5.digest('hex');
+	const sep = stored.indexOf(':');
+	if (sep === -1) return false; // not a valid PBKDF2 hash
+	const salt = stored.slice(0, sep);
+	const hash = stored.slice(sep + 1);
+	const derived = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+	if (hash.length !== derived.length) return false;
+	return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(derived, 'hex'));
 };
 
 exports.toBase64 = function (content) {
