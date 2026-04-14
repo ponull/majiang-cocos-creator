@@ -1,3 +1,5 @@
+var screenAdapter = require("ScreenAdapter");
+
 cc.Class({
     extends: cc.Component,
 
@@ -28,8 +30,7 @@ cc.Class({
     onLoad: function () {
         if(!cc.sys.isNative && cc.sys.isMobile){
             var cvs = this.node.getComponent(cc.Canvas);
-            cvs.fitHeight = true;
-            cvs.fitWidth = true;
+            screenAdapter.applyCanvasFit(cvs);
         }
         if(!cc.vv){
             cc.director.loadScene("loading");
@@ -84,9 +85,9 @@ cc.Class({
             sprite.spriteFrame = null;
         }
         //获取真实宽度
-        var realwidth = cc.director.getVisibleSize().width;
-        myholds.scaleX *= realwidth/1280;
-        myholds.scaleY *= realwidth/1280;  
+        var widthScale = screenAdapter.getWidthScale(1280,1);
+        myholds.scaleX *= widthScale;
+        myholds.scaleY *= widthScale;
         //加载前后左右
         var sides = ["myself","right","up","left"];
         for(var i = 0; i < sides.length; ++i){

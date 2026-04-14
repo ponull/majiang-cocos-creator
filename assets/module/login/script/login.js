@@ -1,4 +1,6 @@
 //字符串拼接
+var screenAdapter = require("ScreenAdapter");
+
 String.prototype.format = function(args) { 
     //调用的实际参数的个数>0
     if (arguments.length>0) { 
@@ -48,9 +50,7 @@ cc.Class({
     onLoad: function () {
         if(!cc.sys.isNative && cc.sys.isMobile){
             var cvs = this.node.getComponent(cc.Canvas); //获取当前节点Canvas
-            //填充宽高度
-            cvs.fitHeight = true; 
-            cvs.fitWidth = true;
+            screenAdapter.applyCanvasFit(cvs);
         }
         //检查cc.vv是否初始化成功 
         if(!cc.vv){

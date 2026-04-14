@@ -1,5 +1,6 @@
 var Net = require("Net")  //长连接socket
 var Global = require("Global")  //mj所需方法
+var screenAdapter = require("ScreenAdapter");
 cc.Class({
     extends: cc.Component,
 
@@ -78,8 +79,7 @@ cc.Class({
     onLoad: function () {
         if(!cc.sys.isNative && cc.sys.isMobile){
             var cvs = this.node.getComponent(cc.Canvas);
-            cvs.fitHeight = true;
-            cvs.fitWidth = true;
+            screenAdapter.applyCanvasFit(cvs);
         }
         if(!cc.vv){
             cc.director.loadScene("loading");
