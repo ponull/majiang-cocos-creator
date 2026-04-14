@@ -3,6 +3,7 @@ if (!cc.loader.loadResAll) {
     cc.loader.loadResAll = cc.loader.loadResDir;
 }
 
+var screenAdapter = require("ScreenAdapter");
 var EventBus = require('EventBus');
 var EventConstants = require('EventConstants');
 
@@ -34,9 +35,7 @@ cc.Class({
         if(!cc.sys.isNative ){   //&& cc.sys.isMobile
             //获取canvas节点
             var cvs = this.node.getComponent(cc.Canvas);
-            //填充宽高度
-            cvs.fitHeight = true;
-            cvs.fitWidth = true;
+            screenAdapter.applyCanvasFit(cvs);
         }
         this.initMgr();//初始化各组件脚本
         //标签内容赋值

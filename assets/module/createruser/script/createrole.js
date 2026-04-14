@@ -1,3 +1,5 @@
+var screenAdapter = require("ScreenAdapter");
+
 cc.Class({
     extends: cc.Component,
 
@@ -54,8 +56,7 @@ cc.Class({
     onLoad: function () {
         if(!cc.sys.isNative && cc.sys.isMobile){
             var cvs = this.node.getComponent(cc.Canvas);
-            cvs.fitHeight = true;
-            cvs.fitWidth = true;
+            screenAdapter.applyCanvasFit(cvs);
         }
         this.onRandomBtnClicked();  //点击一次随机名字
     },
@@ -77,4 +78,3 @@ cc.Class({
 
     // },
 });
-

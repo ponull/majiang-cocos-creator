@@ -1,3 +1,5 @@
+var screenAdapter = require("ScreenAdapter");
+
 cc.Class({
     extends: cc.Component,
 
@@ -22,8 +24,7 @@ cc.Class({
         var gameChild = this.node.getChildByName("game");
         var myself = gameChild.getChildByName("myself");
         var pengangroot = myself.getChildByName("penggangs");
-        var realwidth = cc.director.getVisibleSize().width;
-        var scale = realwidth / 1280;
+        var scale = screenAdapter.getWidthScale(1280,1);
         pengangroot.scaleX *= scale;
         pengangroot.scaleY *= scale;
         

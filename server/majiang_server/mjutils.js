@@ -7,7 +7,6 @@ function checkTingPai(seatData,begin,end){
 		//将牌加入到计数中
 		var old = seatData.countMap[i];
 		if(old == null){
-			old = 0;
 			seatData.countMap[i] = 1;
 		}
 		else{
@@ -26,7 +25,12 @@ function checkTingPai(seatData,begin,end){
 		}
 		
 		//搞完以后，撤消刚刚加的牌
-		seatData.countMap[i] = old;
+		if(old == null){
+			delete seatData.countMap[i];
+		}
+		else{
+			seatData.countMap[i] = old;
+		}
 		seatData.holds.pop();
 	}	
 }
@@ -249,13 +253,14 @@ for(k in seatData.tingMap){
 exports.checkTingPai = checkTingPai;
 
 exports.getMJType = function(pai){
-      if(id >= 0 && id < 9){
+      if(pai >= 0 && pai < 9){
           return 0;
       }
-      else if(id >= 9 && id < 18){
+      else if(pai >= 9 && pai < 18){
           return 1;
       }
-      else if(id >= 18 && id < 27){
+      else if(pai >= 18 && pai < 27){
           return 2;
       }
+      return -1;
 }
